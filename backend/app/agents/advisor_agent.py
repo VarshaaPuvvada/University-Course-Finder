@@ -1,5 +1,6 @@
 import json
 
+from app.learning.intelligence import token_budget_text
 from app.llm.groq_client import GroqClient
 from app.rag.course_repository import Course
 
@@ -56,7 +57,7 @@ def _llm_enhanced_advice(
             "type": course.course_type,
             "skills": course.skills[:8],
             "prerequisite_gaps": prerequisite_gaps.get(course.id, []),
-            "description": _shorten(course.description, 700),
+            "description": token_budget_text(course.description, 120),
             "score": round(score, 4),
         }
         for course, score in ranked_courses

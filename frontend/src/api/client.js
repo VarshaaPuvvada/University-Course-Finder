@@ -18,17 +18,25 @@ export async function analytics() {
 
 export async function upload(endpoint, file, form) {
   const body = new FormData();
+  const topK = form.topK ? Number(form.topK) : 5;
   body.append("file", file);
   body.append("current_skills", form.currentSkills);
-  body.append("student_level", form.studentLevel);
+  body.append("student_level", form.studentLevel || "beginner");
   body.append("career_goal", form.careerGoal);
-  body.append("top_k", String(form.topK));
-  body.append("organizations", form.organizations || "");
-  body.append("difficulties", form.difficulties || "");
-  body.append("skill_categories", form.skillCategories || "");
-  body.append("min_rating", form.minRating || "");
-  body.append("strict_difficulty", String(Boolean(form.strictDifficulty)));
-  body.append("use_llm_judge", String(Boolean(form.useLlmJudge)));
+  body.append("top_k", String(Math.min(Math.max(topK, 1), 20)));
+  body.append("topK", String(Math.min(Math.max(topK, 1), 20)));
+  body.append("organizations", "");
+  body.append("difficulties", "");
+  body.append("skill_categories", "");
+  body.append("min_rating", "");
+  body.append("strict_difficulty", "false");
+  body.append("use_llm_judge", "false");
+  body.append("preferred_skills", "");
+  body.append("completed_courses", "");
+  body.append("liked_courses", "");
+  body.append("disliked_courses", "");
+  body.append("learner_progress", "");
+  body.append("peer_group", "");
   const response = await fetch(`${API_BASE}${endpoint}`, { method: "POST", body });
   if (!response.ok) throw new Error(await response.text());
   return response.json();

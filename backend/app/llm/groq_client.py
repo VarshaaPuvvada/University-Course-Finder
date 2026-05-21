@@ -1,6 +1,7 @@
 import os
 
 from app.utils.env import load_backend_env
+from app.utils.tracing import trace_span
 
 
 class GroqClient:
@@ -23,14 +24,24 @@ class GroqClient:
 
         client = Groq(api_key=self.api_key)
         try:
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                temperature=0.2,
-            )
+            with trace_span(
+                "llm.groq.complete",
+                run_type="llm",
+                inputs={
+                    "model": self.model,
+                    "system_prompt_length": len(system_prompt),
+                    "user_prompt_length": len(user_prompt),
+                },
+                metadata={"provider": "groq", "model": self.model},
+            ):
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    temperature=0.2,
+                )
         except Exception:
             return None
         return response.choices[0].message.content

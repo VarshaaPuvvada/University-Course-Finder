@@ -1,25 +1,39 @@
 Intelligent University Course Finder - Evaluation Metrics
-Generated at: 2026-05-21T09:32:59+00:00
+Generated at: 2026-05-21T17:13:55+00:00
 
-Normalized query: data analysis with sql
-Recommendation count: 1
-Learning path length: 3
-Career alignment: Recommended career direction: roles using Databases, SQL, Data Management.
+Normalized query: prompt i want to learn computer vision and reinforcement learning for self-driving cars current skills python linear algebra student level intermediate career goal autonomous systems engineer number of results three
+Recommendation count: 3
+Learning path length: 8
+Career alignment: Recommended career direction: roles using Cloud Computing, Computer Architecture, Operating Systems, Algebra.
 
 Retrieval metrics:
-- context_precision: 1.000
-- faithfulness: 1.000
-- recall_proxy: 0.600
+- ragas_available: 0.000
+- ragas_error: 1.000
+- retrieved_with_explanations: 1.000
+- retrieved_with_skills: 1.000
 
 Agent metrics:
-- hallucination_risk_proxy: 0.150
-- reasoning_proxy: 1.000
+- deepeval_answer_relevancy_error: 1.000
+- deepeval_available: 1.000
+- deepeval_hallucination_error: 1.000
 - skill_gap_coverage: 1.000
 
 Recommendations:
-1. learn sql basics for data science
-   Organization: university of california, davis
+1. Introduction To Computers And Operating Systems And Security
+   Organization: Microsoft
    Difficulty: beginner
-   Final score: 0.9340
-   Skills: Databases, SQL, Data Management, Data Analysis, Big Data, Data Model, Exploratory Data Analysis, Database Administration
-   Prerequisite gaps: python programming, statistics
+   Final score: 0.9244
+   Skills: Cloud Computing, Computer Architecture, Operating Systems, System Security
+   Prerequisite gaps: None
+2. Mathematics For Machine Learning
+   Organization: Imperial College London
+   Difficulty: beginner
+   Final score: 0.8947
+   Skills: Algebra, Linear Algebra, Mathematics, Machine Learning, Mathematical Theory & Analysis, Computer Programming, Python Programming, Machine Learning Algorithms
+   Prerequisite gaps: statistics
+3. IBM Applied AI
+   Organization: IBM
+   Difficulty: beginner
+   Final score: 0.8601
+   Skills: Machine Learning, Deep Learning, Machine Learning Algorithms, Artificial Neural Networks, Python Programming, Cloud Computing, Computer Vision, Human Learning
+   Prerequisite gaps: statistics

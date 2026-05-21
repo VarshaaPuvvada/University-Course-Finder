@@ -4,12 +4,17 @@ python-multipart==0.0.20
 pinecone==7.3.0
 python-dotenv==1.2.2
 langgraph==0.2.74
+langsmith==0.8.5
 neo4j==5.27.0
 groq==0.13.1
-PyMuPDF==1.25.2
+pypdf==6.12.0
 pytesseract==0.3.13
 Pillow>=12.0.0
 sentence-transformers==3.3.1; python_version < "3.14"
 deepeval==3.7.2
-ragas==0.3.9
-datasets==4.4.1
+# RAGAS depends on scikit-network, which currently needs C++ build tools on Python 3.14/Windows.
+# On Python 3.14 in this workspace it was installed with:
+#   pip install ragas==0.3.9 datasets==4.4.1 --no-deps
+#   pip install tiktoken appdirs diskcache gitpython instructor langchain==0.3.30 langchain-community==0.3.31 langchain-openai==0.3.35 pyarrow dill==0.4.0 multiprocess==0.70.18 fsspec==2025.10.0
+ragas==0.3.9; python_version < "3.14"
+datasets==4.4.1; python_version < "3.14"

@@ -15,13 +15,20 @@ async def upload_pdf(
     current_skills: str = Form(""),
     student_level: str = Form("beginner"),
     career_goal: str = Form(""),
-    top_k: int = Form(5),
+    top_k: str = Form(""),
+    topK: str = Form(""),
     organizations: str = Form(""),
     difficulties: str = Form(""),
     skill_categories: str = Form(""),
     min_rating: str = Form(""),
     strict_difficulty: str = Form("false"),
     use_llm_judge: str = Form("false"),
+    preferred_skills: str = Form(""),
+    completed_courses: str = Form(""),
+    liked_courses: str = Form(""),
+    disliked_courses: str = Form(""),
+    learner_progress: str = Form(""),
+    peer_group: str = Form(""),
 ) -> dict:
     try:
         extracted_text = PDFParser().extract_text(await file.read())
@@ -35,13 +42,19 @@ async def upload_pdf(
         current_skills=current_skills,
         student_level=student_level,
         career_goal=career_goal,
-        top_k=top_k,
+        top_k=_parse_top_k(top_k, topK),
         organizations=organizations,
         difficulties=difficulties,
         skill_categories=skill_categories,
         min_rating=min_rating,
         strict_difficulty=strict_difficulty,
         use_llm_judge=use_llm_judge,
+        preferred_skills=preferred_skills,
+        completed_courses=completed_courses,
+        liked_courses=liked_courses,
+        disliked_courses=disliked_courses,
+        learner_progress=learner_progress,
+        peer_group=peer_group,
     )
 
 
@@ -51,13 +64,20 @@ async def upload_image(
     current_skills: str = Form(""),
     student_level: str = Form("beginner"),
     career_goal: str = Form(""),
-    top_k: int = Form(5),
+    top_k: str = Form(""),
+    topK: str = Form(""),
     organizations: str = Form(""),
     difficulties: str = Form(""),
     skill_categories: str = Form(""),
     min_rating: str = Form(""),
     strict_difficulty: str = Form("false"),
     use_llm_judge: str = Form("false"),
+    preferred_skills: str = Form(""),
+    completed_courses: str = Form(""),
+    liked_courses: str = Form(""),
+    disliked_courses: str = Form(""),
+    learner_progress: str = Form(""),
+    peer_group: str = Form(""),
 ) -> dict:
     try:
         extracted_text = ImageProcessor().extract_query_text(await file.read())
@@ -71,13 +91,19 @@ async def upload_image(
         current_skills=current_skills,
         student_level=student_level,
         career_goal=career_goal,
-        top_k=top_k,
+        top_k=_parse_top_k(top_k, topK),
         organizations=organizations,
         difficulties=difficulties,
         skill_categories=skill_categories,
         min_rating=min_rating,
         strict_difficulty=strict_difficulty,
         use_llm_judge=use_llm_judge,
+        preferred_skills=preferred_skills,
+        completed_courses=completed_courses,
+        liked_courses=liked_courses,
+        disliked_courses=disliked_courses,
+        learner_progress=learner_progress,
+        peer_group=peer_group,
     )
 
 
@@ -93,6 +119,12 @@ def _recommend_from_extracted_text(
     min_rating: str,
     strict_difficulty: str,
     use_llm_judge: str,
+    preferred_skills: str,
+    completed_courses: str,
+    liked_courses: str,
+    disliked_courses: str,
+    learner_progress: str,
+    peer_group: str,
 ) -> dict:
     query = " ".join(extracted_text.split())
     if len(query) < 2:
@@ -111,6 +143,12 @@ def _recommend_from_extracted_text(
             min_rating=float(min_rating) if min_rating else None,
             strict_difficulty=_to_bool(strict_difficulty),
             use_llm_judge=_to_bool(use_llm_judge),
+            preferred_skills=_split_skills(preferred_skills),
+            completed_courses=_split_skills(completed_courses),
+            liked_courses=_split_skills(liked_courses),
+            disliked_courses=_split_skills(disliked_courses),
+            learner_progress=float(learner_progress) if learner_progress else None,
+            peer_group=peer_group or None,
         )
     )
     return {
@@ -126,3 +164,10 @@ def _split_skills(value: str) -> list[str]:
 
 def _to_bool(value: str) -> bool:
     return value.lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_top_k(*values: str) -> int:
+    for value in values:
+        if value:
+            return min(max(int(value), 1), 20)
+    return 5

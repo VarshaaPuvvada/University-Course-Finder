@@ -13,6 +13,12 @@ class RecommendRequest(BaseModel):
     min_rating: float | None = Field(default=None, ge=0, le=5)
     strict_difficulty: bool = False
     use_llm_judge: bool = False
+    preferred_skills: list[str] = Field(default_factory=list)
+    completed_courses: list[str] = Field(default_factory=list)
+    liked_courses: list[str] = Field(default_factory=list)
+    disliked_courses: list[str] = Field(default_factory=list)
+    learner_progress: float | None = Field(default=None, ge=0, le=1)
+    peer_group: str | None = None
 
 
 class CourseRecommendation(BaseModel):
@@ -30,6 +36,11 @@ class CourseRecommendation(BaseModel):
     prerequisite_gaps: list[str]
     final_score: float
     llm_enhanced: bool = False
+    success_rate: float | None = None
+    completion_rate: float | None = None
+    popularity_percentile: float | None = None
+    matched_skills: list[str] = Field(default_factory=list)
+    peer_recommendation_score: float | None = None
 
 
 class RecommendResponse(BaseModel):
@@ -39,6 +50,10 @@ class RecommendResponse(BaseModel):
     career_alignment: str | None
     advisor_summary: str | None = None
     validation_warnings: list[str] = Field(default_factory=list)
+    learner_domain: str | None = None
+    agent_handoffs: list[str] = Field(default_factory=list)
+    agent_messages: list[dict[str, str]] = Field(default_factory=list)
+    skill_graph: list[dict] = Field(default_factory=list)
 
 
 class AnalyticsResponse(BaseModel):
@@ -46,6 +61,10 @@ class AnalyticsResponse(BaseModel):
     popular_skills: list[dict[str, str | int]]
     difficulty_distribution: dict[str, int]
     top_organizations: list[dict[str, str | int]]
+    success_rate_by_difficulty: dict[str, float] = Field(default_factory=dict)
+    completion_rate_by_difficulty: dict[str, float] = Field(default_factory=dict)
+    high_success_courses: list[dict[str, str | float]] = Field(default_factory=list)
+    skill_graph_overview: list[dict] = Field(default_factory=list)
 
 
 class EvaluationRequest(BaseModel):

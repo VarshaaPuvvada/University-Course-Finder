@@ -4,11 +4,11 @@ import { analytics, recommend, upload } from "./api/client";
 import "./styles/app.css";
 
 const initialForm = {
-  query: "I want to learn how AI can predict stock prices",
-  currentSkills: "Python Programming",
-  studentLevel: "beginner",
-  careerGoal: "Machine learning engineer in finance",
-  topK: 5,
+  query: "",
+  currentSkills: "",
+  studentLevel: "",
+  careerGoal: "",
+  topK: "",
 };
 
 export default function App() {
@@ -30,15 +30,21 @@ export default function App() {
       const data = await recommend({
         query: form.query,
         current_skills: splitSkills(form.currentSkills),
-        student_level: form.studentLevel,
+        student_level: form.studentLevel || "beginner",
         career_goal: form.careerGoal || null,
-          top_k: Number(form.topK),
-          organizations: splitSkills(form.organizations || ""),
-          difficulties: splitSkills(form.difficulties || ""),
-          skill_categories: splitSkills(form.skillCategories || ""),
-          min_rating: form.minRating ? Number(form.minRating) : null,
-          strict_difficulty: Boolean(form.strictDifficulty),
-          use_llm_judge: Boolean(form.useLlmJudge),
+        top_k: form.topK ? Number(form.topK) : 5,
+        organizations: [],
+        difficulties: [],
+        skill_categories: [],
+        min_rating: null,
+        strict_difficulty: false,
+        use_llm_judge: false,
+        preferred_skills: [],
+        completed_courses: [],
+        liked_courses: [],
+        disliked_courses: [],
+        learner_progress: null,
+        peer_group: null,
       });
       setResult(data);
     } catch (err) {
@@ -96,6 +102,7 @@ export default function App() {
                 value={form.studentLevel}
                 onChange={(event) => setForm({ ...form, studentLevel: event.target.value })}
               >
+                <option value="">Select level</option>
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
                 <option value="advanced">Advanced</option>
@@ -117,54 +124,6 @@ export default function App() {
                 value={form.topK}
                 onChange={(event) => setForm({ ...form, topK: event.target.value })}
               />
-            </label>
-            <label>
-              Min rating
-              <input
-                type="number"
-                min="0"
-                max="5"
-                step="0.1"
-                value={form.minRating || ""}
-                onChange={(event) => setForm({ ...form, minRating: event.target.value })}
-              />
-            </label>
-            <label>
-              Organizations
-              <input
-                value={form.organizations || ""}
-                onChange={(event) => setForm({ ...form, organizations: event.target.value })}
-              />
-            </label>
-            <label>
-              Skill filter
-              <input
-                value={form.skillCategories || ""}
-                onChange={(event) => setForm({ ...form, skillCategories: event.target.value })}
-              />
-            </label>
-            <label>
-              Difficulty filter
-              <input
-                value={form.difficulties || ""}
-                onChange={(event) => setForm({ ...form, difficulties: event.target.value })}
-              />
-            </label>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={Boolean(form.strictDifficulty)}
-                onChange={(event) => setForm({ ...form, strictDifficulty: event.target.checked })}
-              />
-              Strict level
-            </label>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={Boolean(form.useLlmJudge)}
-                onChange={(event) => setForm({ ...form, useLlmJudge: event.target.checked })}
-              />
-              LLM judge
             </label>
           </div>
 
@@ -211,6 +170,8 @@ export default function App() {
                   <span>Type: {course.course_type || "Course"}</span>
                   <span>Reviews: {Math.round(course.review_count || 0).toLocaleString()}</span>
                   <span>Score: {course.final_score}</span>
+                  {course.success_rate != null && <span>Success: {Math.round(course.success_rate * 100)}%</span>}
+                  {course.completion_rate != null && <span>Completion: {Math.round(course.completion_rate * 100)}%</span>}
                   {course.llm_enhanced && <span>LLM enhanced</span>}
                 </div>
                 <div className="field-block">
@@ -261,7 +222,10 @@ function UploadButton({ icon, label, accept, onFile }) {
       <input
         type="file"
         accept={accept}
-        onChange={(event) => onFile(event.target.files?.[0])}
+        onChange={(event) => {
+          onFile(event.target.files?.[0]);
+          event.target.value = "";
+        }}
       />
     </label>
   );

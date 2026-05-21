@@ -51,8 +51,8 @@ class PineconeService:
     def describe_stats(self) -> dict:
         if not self.enabled:
             return {}
-        index = self._client().Index(self.index_name)
         try:
+            index = self._client().Index(self.index_name)
             stats = index.describe_index_stats()
         except Exception:
             return {}
