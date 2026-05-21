@@ -1,4 +1,16 @@
+import warnings
 from typing import TypedDict
+
+try:
+    from langchain_core._api.deprecation import LangChainPendingDeprecationWarning
+except ImportError:
+    LangChainPendingDeprecationWarning = Warning
+
+warnings.filterwarnings(
+    "ignore",
+    message=".*allowed_objects.*",
+    category=LangChainPendingDeprecationWarning,
+)
 
 from app.agents.advisor_agent import run_advisor_agent
 from app.agents.career_agent import run_career_agent
@@ -14,6 +26,11 @@ class RecommendationState(TypedDict):
     student_level: str
     career_goal: str | None
     top_k: int
+    organizations: list[str]
+    difficulties: list[str]
+    skill_categories: list[str]
+    min_rating: float | None
+    strict_difficulty: bool
     ranked_courses: list[tuple[Course, float]]
     prerequisite_gaps: dict[str, list[str]]
     learning_path: list[str]
@@ -27,15 +44,45 @@ def run_recommendation_workflow(
     student_level: str,
     career_goal: str | None,
     top_k: int,
+    organizations: list[str] | None = None,
+    difficulties: list[str] | None = None,
+    skill_categories: list[str] | None = None,
+    min_rating: float | None = None,
+    strict_difficulty: bool = False,
 ) -> RecommendationState:
     try:
-        from langgraph.graph import END, StateGraph
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=".*allowed_objects.*",
+                category=Warning,
+            )
+            from langgraph.graph import END, StateGraph
     except ImportError:
-        return _run_sequential_workflow(query, current_skills, student_level, career_goal, top_k)
+        return _run_sequential_workflow(
+            query,
+            current_skills,
+            student_level,
+            career_goal,
+            top_k,
+            organizations,
+            difficulties,
+            skill_categories,
+            min_rating,
+            strict_difficulty,
+        )
 
     def retrieval_node(state: RecommendationState) -> RecommendationState:
         state["ranked_courses"] = run_retrieval_agent(
-            state["query"], state["current_skills"], state["student_level"], state["top_k"]
+            state["query"],
+            state["current_skills"],
+            state["student_level"],
+            state["top_k"],
+            state["organizations"],
+            state["difficulties"],
+            state["skill_categories"],
+            state["min_rating"],
+            state["strict_difficulty"],
         )
         return state
 
@@ -78,6 +125,11 @@ def run_recommendation_workflow(
             "student_level": student_level,
             "career_goal": career_goal,
             "top_k": top_k,
+            "organizations": organizations or [],
+            "difficulties": difficulties or [],
+            "skill_categories": skill_categories or [],
+            "min_rating": min_rating,
+            "strict_difficulty": strict_difficulty,
             "ranked_courses": [],
             "prerequisite_gaps": {},
             "learning_path": [],
@@ -93,8 +145,23 @@ def _run_sequential_workflow(
     student_level: str,
     career_goal: str | None,
     top_k: int,
+    organizations: list[str] | None = None,
+    difficulties: list[str] | None = None,
+    skill_categories: list[str] | None = None,
+    min_rating: float | None = None,
+    strict_difficulty: bool = False,
 ) -> RecommendationState:
-    ranked_courses = run_retrieval_agent(query, current_skills, student_level, top_k)
+    ranked_courses = run_retrieval_agent(
+        query,
+        current_skills,
+        student_level,
+        top_k,
+        organizations,
+        difficulties,
+        skill_categories,
+        min_rating,
+        strict_difficulty,
+    )
     prerequisite_gaps = run_skill_gap_agent(ranked_courses, current_skills)
     learning_path = run_planner_agent(ranked_courses)
     career_alignment = run_career_agent(ranked_courses, career_goal)
@@ -105,6 +172,11 @@ def _run_sequential_workflow(
         "student_level": student_level,
         "career_goal": career_goal,
         "top_k": top_k,
+        "organizations": organizations or [],
+        "difficulties": difficulties or [],
+        "skill_categories": skill_categories or [],
+        "min_rating": min_rating,
+        "strict_difficulty": strict_difficulty,
         "ranked_courses": ranked_courses,
         "prerequisite_gaps": prerequisite_gaps,
         "learning_path": learning_path,

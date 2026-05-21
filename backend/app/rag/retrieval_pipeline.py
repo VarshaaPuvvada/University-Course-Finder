@@ -56,11 +56,34 @@ def retrieve_courses(
     current_skills: list[str],
     student_level: str,
     top_k: int,
+    organizations: list[str] | None = None,
+    difficulties: list[str] | None = None,
+    skill_categories: list[str] | None = None,
+    min_rating: float | None = None,
+    strict_difficulty: bool = False,
 ) -> list[tuple[Course, float]]:
     normalized_query = normalize_query(query)
     course_by_id = {course.id: course for course in load_courses()}
 
-    bm25_results = _bm25_index().search(normalized_query, top_k=30)
+    candidate_pool = [
+        course
+        for course in load_courses()
+        if _passes_filters(
+            course=course,
+            student_level=student_level,
+            organizations=organizations or [],
+            difficulties=difficulties or [],
+            skill_categories=skill_categories or [],
+            min_rating=min_rating,
+            strict_difficulty=strict_difficulty,
+        )
+    ]
+
+    bm25_results = [
+        (course, score)
+        for course, score in _bm25_index().search(normalized_query, top_k=80)
+        if course in candidate_pool
+    ][:30]
     semantic_results: list[tuple[Course, float]] = []
 
     embedding_service = OpenRouterEmbeddingService()
@@ -72,13 +95,17 @@ def retrieve_courses(
             semantic_results = [
                 (course_by_id[course_id], score)
                 for course_id, score in pinecone_matches
-                if course_id in course_by_id
+                if course_id in course_by_id and course_by_id[course_id] in candidate_pool
             ]
     except Exception:
         semantic_results = []
 
     if not semantic_results:
-        semantic_results = _semantic_index().search(normalized_query, top_k=30)
+        semantic_results = [
+            (course, score)
+            for course, score in _semantic_index().search(normalized_query, top_k=80)
+            if course in candidate_pool
+        ][:30]
 
     fused = reciprocal_rank_fusion([semantic_results, bm25_results], top_k=30)
     reranked = BGEReranker().rerank(normalized_query, fused, top_k=30)
@@ -97,3 +124,38 @@ def retrieve_courses(
         personalized.append((course, final_score))
 
     return sorted(personalized, key=lambda item: item[1], reverse=True)[:top_k]
+
+
+def _passes_filters(
+    course: Course,
+    student_level: str,
+    organizations: list[str],
+    difficulties: list[str],
+    skill_categories: list[str],
+    min_rating: float | None,
+    strict_difficulty: bool,
+) -> bool:
+    if organizations:
+        allowed_orgs = {organization.lower() for organization in organizations}
+        if course.organization.lower() not in allowed_orgs:
+            return False
+
+    if difficulties:
+        allowed_difficulties = {difficulty.lower() for difficulty in difficulties}
+        if course.difficulty.lower() not in allowed_difficulties:
+            return False
+
+    if strict_difficulty and not difficulties:
+        if course.difficulty.lower() != student_level.lower():
+            return False
+
+    if min_rating is not None and (course.rating is None or course.rating < min_rating):
+        return False
+
+    if skill_categories:
+        required_skills = {skill.lower() for skill in skill_categories}
+        course_skills = {skill.lower() for skill in course.skills}
+        if not required_skills & course_skills:
+            return False
+
+    return True

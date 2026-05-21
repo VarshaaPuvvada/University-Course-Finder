@@ -17,6 +17,7 @@ def evaluate(payload: EvaluationRequest) -> EvaluationResponse:
         recommendation=payload.recommendation,
         retrieval_metrics=retrieval_metrics,
         agent_metrics=agent_metrics,
+        judge_metrics={},
     )
     return EvaluationResponse(
         retrieval_metrics=retrieval_metrics,

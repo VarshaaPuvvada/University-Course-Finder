@@ -56,7 +56,7 @@ class PineconeService:
             stats = index.describe_index_stats()
         except Exception:
             return {}
-        return dict(stats) if stats else {}
+        return _to_plain_dict(stats)
 
     def upsert_courses(
         self,
@@ -101,4 +101,20 @@ class PineconeService:
             namespace=self.namespace,
             include_metadata=False,
         )
-        return [(match["id"], float(match["score"])) for match in response.get("matches", [])]
+        data = _to_plain_dict(response)
+        return [(match["id"], float(match["score"])) for match in data.get("matches", [])]
+
+
+def _to_plain_dict(value) -> dict:
+    if not value:
+        return {}
+    if isinstance(value, dict):
+        return value
+    if hasattr(value, "to_dict"):
+        return value.to_dict()
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    try:
+        return {key: getattr(value, key) for key in value.__dict__ if not key.startswith("_")}
+    except Exception:
+        return {}

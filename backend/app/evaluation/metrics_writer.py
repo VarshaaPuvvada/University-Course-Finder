@@ -11,6 +11,7 @@ def write_evaluation_metrics(
     recommendation: RecommendResponse,
     retrieval_metrics: dict[str, float],
     agent_metrics: dict[str, float],
+    judge_metrics: dict[str, float] | None = None,
 ) -> Path:
     timestamp = datetime.now(UTC).isoformat(timespec="seconds")
     lines = [
@@ -24,16 +25,14 @@ def write_evaluation_metrics(
         "",
         "Retrieval metrics:",
     ]
-    lines.extend(
-        f"- {name}: {value:.3f}"
-        for name, value in sorted(retrieval_metrics.items())
-    )
+    lines.extend(_format_metrics(retrieval_metrics))
     lines.append("")
     lines.append("Agent metrics:")
-    lines.extend(
-        f"- {name}: {value:.3f}"
-        for name, value in sorted(agent_metrics.items())
-    )
+    lines.extend(_format_metrics(agent_metrics))
+    if judge_metrics:
+        lines.append("")
+        lines.append("LLM judge metrics:")
+        lines.extend(_format_metrics(judge_metrics))
     lines.append("")
     lines.append("Recommendations:")
     for index, item in enumerate(recommendation.recommendations, start=1):
@@ -51,3 +50,13 @@ def write_evaluation_metrics(
 
     METRICS_PATH.write_text("\n".join(lines), encoding="utf-8")
     return METRICS_PATH
+
+
+def _format_metrics(metrics: dict[str, float]) -> list[str]:
+    lines: list[str] = []
+    for name, value in sorted(metrics.items()):
+        if isinstance(value, int | float):
+            lines.append(f"- {name}: {value:.3f}")
+        else:
+            lines.append(f"- {name}: {value}")
+    return lines

@@ -32,7 +32,13 @@ export default function App() {
         current_skills: splitSkills(form.currentSkills),
         student_level: form.studentLevel,
         career_goal: form.careerGoal || null,
-        top_k: Number(form.topK),
+          top_k: Number(form.topK),
+          organizations: splitSkills(form.organizations || ""),
+          difficulties: splitSkills(form.difficulties || ""),
+          skill_categories: splitSkills(form.skillCategories || ""),
+          min_rating: form.minRating ? Number(form.minRating) : null,
+          strict_difficulty: Boolean(form.strictDifficulty),
+          use_llm_judge: Boolean(form.useLlmJudge),
       });
       setResult(data);
     } catch (err) {
@@ -112,6 +118,54 @@ export default function App() {
                 onChange={(event) => setForm({ ...form, topK: event.target.value })}
               />
             </label>
+            <label>
+              Min rating
+              <input
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                value={form.minRating || ""}
+                onChange={(event) => setForm({ ...form, minRating: event.target.value })}
+              />
+            </label>
+            <label>
+              Organizations
+              <input
+                value={form.organizations || ""}
+                onChange={(event) => setForm({ ...form, organizations: event.target.value })}
+              />
+            </label>
+            <label>
+              Skill filter
+              <input
+                value={form.skillCategories || ""}
+                onChange={(event) => setForm({ ...form, skillCategories: event.target.value })}
+              />
+            </label>
+            <label>
+              Difficulty filter
+              <input
+                value={form.difficulties || ""}
+                onChange={(event) => setForm({ ...form, difficulties: event.target.value })}
+              />
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={Boolean(form.strictDifficulty)}
+                onChange={(event) => setForm({ ...form, strictDifficulty: event.target.checked })}
+              />
+              Strict level
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={Boolean(form.useLlmJudge)}
+                onChange={(event) => setForm({ ...form, useLlmJudge: event.target.checked })}
+              />
+              LLM judge
+            </label>
           </div>
 
           <div className="upload-row">
@@ -126,15 +180,44 @@ export default function App() {
         <section className="results-grid">
           <div className="recommendations">
             <h2>Recommendations</h2>
+            {result?.advisor_summary && <p className="advisor-summary">{result.advisor_summary}</p>}
+            {result?.validation_warnings?.length > 0 && (
+              <div className="warning-list">
+                {result.validation_warnings.map((warning) => <span key={warning}>{warning}</span>)}
+              </div>
+            )}
             {result?.recommendations?.map((course) => (
               <article className="course-card" key={`${course.title}-${course.organization}`}>
                 <div>
                   <h3>{course.title}</h3>
-                  <p>{course.organization} - {course.difficulty} - {course.rating ?? "N/A"}</p>
+                  <dl className="field-list compact">
+                    <div><dt>Organization</dt><dd>{course.organization}</dd></div>
+                    <div><dt>Difficulty</dt><dd>{course.difficulty}</dd></div>
+                    <div><dt>Rating</dt><dd>{course.rating ?? "N/A"}</dd></div>
+                    <div><dt>Duration</dt><dd>{course.duration || "N/A"}</dd></div>
+                  </dl>
                 </div>
-                <p>{course.explanation}</p>
-                <div className="skill-list">
-                  {course.skills.slice(0, 6).map((skill) => <span key={skill}>{skill}</span>)}
+                <div className="field-block">
+                  <span>Why this course</span>
+                  <p>{course.explanation}</p>
+                </div>
+                {course.description && (
+                  <div className="field-block">
+                    <span>Course description</span>
+                    <p>{course.description}</p>
+                  </div>
+                )}
+                <div className="course-meta">
+                  <span>Type: {course.course_type || "Course"}</span>
+                  <span>Reviews: {Math.round(course.review_count || 0).toLocaleString()}</span>
+                  <span>Score: {course.final_score}</span>
+                  {course.llm_enhanced && <span>LLM enhanced</span>}
+                </div>
+                <div className="field-block">
+                  <span>Skills</span>
+                  <div className="skill-list">
+                    {course.skills.slice(0, 6).map((skill) => <span key={skill}>{skill}</span>)}
+                  </div>
                 </div>
                 {course.prerequisite_gaps.length > 0 && (
                   <p className="gap">Prerequisite gaps: {course.prerequisite_gaps.join(", ")}</p>

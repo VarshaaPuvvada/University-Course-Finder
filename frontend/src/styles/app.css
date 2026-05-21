@@ -76,7 +76,7 @@ textarea {
 
 .controls {
   display: grid;
-  grid-template-columns: 1.2fr 0.7fr 1.2fr 0.45fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-top: 12px;
 }
@@ -86,6 +86,17 @@ label {
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
+}
+
+.checkbox-label {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.checkbox-label input {
+  width: auto;
 }
 
 .primary-button,
@@ -147,6 +158,45 @@ label {
   line-height: 1.45;
 }
 
+.field-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.field-list.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 8px;
+}
+
+.field-list div {
+  display: grid;
+  gap: 2px;
+}
+
+.field-list dt,
+.field-block span {
+  color: #607078;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.field-list dd {
+  color: #27343a;
+  font-size: 13px;
+  margin: 0;
+}
+
+.field-block {
+  display: grid;
+  gap: 6px;
+}
+
+.field-block p {
+  margin-bottom: 0;
+}
+
 .skill-list,
 .mini-list {
   display: flex;
@@ -166,6 +216,40 @@ label {
 .gap {
   color: #9f3a12;
   font-weight: 700;
+}
+
+.advisor-summary {
+  background: #eef7f5;
+  border: 1px solid #c8e4dd;
+  border-radius: 8px;
+  color: #23443d;
+  line-height: 1.45;
+  padding: 12px;
+}
+
+.warning-list,
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.warning-list span {
+  background: #fff8e6;
+  border: 1px solid #f0d58c;
+  border-radius: 6px;
+  color: #7a4b00;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.course-meta span {
+  background: #edf2f4;
+  border-radius: 6px;
+  color: #40515a;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 8px;
 }
 
 .path-list {
@@ -202,7 +286,8 @@ label {
 
 @media (max-width: 860px) {
   .controls,
-  .results-grid {
+  .results-grid,
+  .field-list.compact {
     grid-template-columns: 1fr;
   }
 

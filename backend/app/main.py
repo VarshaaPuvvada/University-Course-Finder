@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.analytics import router as analytics_router
 from app.routes.evaluation import router as evaluation_router
+from app.routes.graph import router as graph_router
 from app.routes.recommend import router as recommend_router
 from app.routes.speech import router as speech_router
 from app.routes.upload import router as upload_router
@@ -30,6 +31,7 @@ app.include_router(speech_router)
 app.include_router(upload_router)
 app.include_router(analytics_router)
 app.include_router(evaluation_router)
+app.include_router(graph_router)
 
 
 @app.get("/health")
