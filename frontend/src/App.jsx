@@ -86,6 +86,7 @@ export default function App() {
             value={form.query}
             onChange={(event) => setForm({ ...form, query: event.target.value })}
             aria-label="Learning goal"
+            placeholder="Enter your learning goal"
           />
 
           <div className="controls">
@@ -94,6 +95,7 @@ export default function App() {
               <input
                 value={form.currentSkills}
                 onChange={(event) => setForm({ ...form, currentSkills: event.target.value })}
+                placeholder="Enter your current skills, separated by commas"
               />
             </label>
             <label>
@@ -113,6 +115,7 @@ export default function App() {
               <input
                 value={form.careerGoal}
                 onChange={(event) => setForm({ ...form, careerGoal: event.target.value })}
+                placeholder="Enter your target career role"
               />
             </label>
             <label>
@@ -123,6 +126,7 @@ export default function App() {
                 max="20"
                 value={form.topK}
                 onChange={(event) => setForm({ ...form, topK: event.target.value })}
+                placeholder="Enter number of courses"
               />
             </label>
           </div>
