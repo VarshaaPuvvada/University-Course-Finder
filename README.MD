@@ -1,860 +1,633 @@
-# Intelligent University Course Finder – Complete Architecture & Implementation Plan
+# Intelligent University Course Finder
 
-# 1. Project Goal
+An AI-powered course recommendation system that accepts text, audio, PDF, and image inputs, extracts a learner goal, and recommends relevant Coursera-style university courses with explanations, prerequisite gaps, learning paths, and analytics.
 
-Build an AI-powered multimodal course recommendation system that:
+The project is split into a FastAPI backend and a React/Vite frontend.
 
-* understands user learning goals
-* retrieves relevant university/coursera courses
-* identifies prerequisite gaps
-* generates learning paths
-* aligns recommendations with careers
-* supports multimodal inputs
-* uses hybrid retrieval + multi-agent orchestration
+## Features
 
-The system should support:
+- Text-based course recommendations
+- Audio input through Groq Whisper transcription
+- PDF text extraction through `pypdf`
+- Image OCR through Tesseract, with OpenRouter vision as the implemented fallback
+- Hybrid retrieval using BM25 keyword search, Pinecone vector search, and TF-IDF semantic search as the implemented fallback
+- Reciprocal Rank Fusion and reranking
+- LangGraph multi-agent recommendation workflow
+- Prerequisite gap detection with Neo4j graph support and implemented prerequisite rules as the fallback
+- Learning path generation
+- Career alignment summaries
+- Analytics dashboard data
+- RAGAS, DeepEval, and structural evaluation metrics
+- LangSmith tracing
 
-* text queries
-* speech input
-* image/screenshot input
-* PDF/document input
-
-Example query:
-
-> “I want to learn how AI can predict stock prices.”
-
-The system should:
-
-* retrieve relevant courses
-* identify missing skills
-* validate prerequisites
-* generate structured learning paths
-* explain recommendations
-
----
-
-# 2. Final Recommended Technology Stack
-
-| Component          | Recommended Tool                       |
-| ------------------ | -------------------------------------- |
-| Frontend           | React + Vite              |
-| Backend            | FastAPI                                |
-| Speech-to-text     | Whisper                                |
-| PDF Parsing        | PyMuPDF                                |
-| OCR                | Tesseract OCR                          |
-| Embeddings         | OpenAI text-embedding-3-small or large |
-| Vector DB          | Pinecone                               |
-| Keyword Search     | Local BM25                             |
-| Hybrid Retrieval   | BM25 + Semantic Search                 |
-| Fusion             | Reciprocal Rank Fusion (RRF)           |
-| Reranking          | BGE Reranker / Cohere Rerank           |
-| Multi-Agent System | LangGraph                              |
-| Knowledge Graph    | Neo4j                                  |
-| RAG Evaluation     | RAGAS                                  |
-| Agent Evaluation   | DeepEval                               |
-| Tracing            | LangSmith                              |
-
----
-
-# 3. Why These Tools Were Chosen
-
-## Whisper
-
-Chosen because:
-
-* open source
-* multilingual
-* works offline
-* high accuracy
-* free
-
-Alternatives considered:
-
-* Google Speech-to-Text
-* AssemblyAI
-
-Whisper was preferred due to cost and flexibility.
-
----
-
-## PyMuPDF
-
-Chosen because:
-
-* fast
-* layout aware
-* better for RAG ingestion
-* handles complex PDFs better than PyPDF
-
-PyPDF is mainly useful for simple PDF manipulation.
-
----
-
-## Pinecone
-
-Chosen because:
-
-* easy vector database setup
-* managed infrastructure
-* excellent semantic retrieval support
-
----
-
-## LangGraph
-
-Chosen over CrewAI and AutoGen because:
-
-* stateful workflows
-* graph-based orchestration
-* proper agent handoffs
-* better multi-agent control
-* suitable for structured pipelines
-
-CrewAI is easier but weaker for complex orchestration.
-AutoGen is conversation-oriented and less deterministic.
-
----
-
-## Neo4j
-
-Chosen because:
-
-* prerequisites are naturally graph relationships
-* enables skill dependency traversal
-* helps learning path generation
-* enables prerequisite validation guardrails
-
----
-
-## RAGAS + DeepEval
-
-RAGAS:
-
-* evaluates retrieval quality
-* measures faithfulness/context relevance
-
-DeepEval:
-
-* evaluates agent reasoning
-* hallucination detection
-* LLM-as-judge support
-
----
-
-# 4. Final High-Level Architecture
+## Project Structure
 
 ```text
-Multimodal Input
-(text/speech/pdf/image)
-        ↓
-Text Extraction Layer
-(Whisper / OCR / PyMuPDF)
-        ↓
-Query Normalization
-        ↓
-Embedding Generation
-        ↓
-Hybrid Retrieval
-(semantic + BM25)
-        ↓
-Reciprocal Rank Fusion (RRF)
-        ↓
-Cross Encoder Reranking
-        ↓
-LangGraph Multi-Agent Pipeline
-        ↓
-Neo4j Prerequisite Validation
-        ↓
-Learning Path Generation
-        ↓
-Final Recommendation
-        ↓
-Evaluation + Tracing
-(RAGAS + DeepEval + LangSmith)
+university-course-finder/
++-- README.MD
++-- audio_file_generate.py
++-- input_audio.mp3
++-- input_image.png
++-- input_text.pdf
++-- backend/
+|   +-- requirements.txt
+|   +-- evaluation_metrics.txt
+|   +-- app/
+|   |   +-- main.py
+|   |   +-- agents/
+|   |   |   +-- advisor_agent.py
+|   |   |   +-- career_agent.py
+|   |   |   +-- planner_agent.py
+|   |   |   +-- retrieval_agent.py
+|   |   |   +-- skill_gap_agent.py
+|   |   |   +-- workflow.py
+|   |   +-- evaluation/
+|   |   |   +-- deepeval_eval.py
+|   |   |   +-- groq_deepeval_model.py
+|   |   |   +-- metrics_writer.py
+|   |   |   +-- ragas_eval.py
+|   |   |   +-- runner.py
+|   |   +-- graph/
+|   |   |   +-- neo4j_service.py
+|   |   |   +-- prerequisite_validator.py
+|   |   |   +-- sync_prerequisites.py
+|   |   +-- guardrails/
+|   |   |   +-- learning_guardrails.py
+|   |   +-- learning/
+|   |   |   +-- intelligence.py
+|   |   +-- llm/
+|   |   |   +-- groq_client.py
+|   |   |   +-- model_router.py
+|   |   +-- models/
+|   |   |   +-- schemas.py
+|   |   +-- multimodal/
+|   |   |   +-- image_processor.py
+|   |   |   +-- ocr_service.py
+|   |   |   +-- pdf_parser.py
+|   |   |   +-- whisper_service.py
+|   |   +-- rag/
+|   |   |   +-- bm25.py
+|   |   |   +-- course_repository.py
+|   |   |   +-- embedding_service.py
+|   |   |   +-- index_courses.py
+|   |   |   +-- pinecone_service.py
+|   |   |   +-- retrieval_pipeline.py
+|   |   |   +-- rrf_fusion.py
+|   |   |   +-- semantic_search.py
+|   |   +-- reranker/
+|   |   |   +-- bge_reranker.py
+|   |   +-- routes/
+|   |   |   +-- analytics.py
+|   |   |   +-- evaluation.py
+|   |   |   +-- graph.py
+|   |   |   +-- recommend.py
+|   |   |   +-- speech.py
+|   |   |   +-- upload.py
+|   |   +-- utils/
+|   |       +-- env.py
+|   |       +-- text.py
+|   |       +-- tracing.py
+|   +-- data/
+|   |   +-- raw/
+|   |   |   +-- coursera_course_dataset_v2_no_null.csv
+|   |   |   +-- coursera_course_dataset_v3.csv
+|   |   +-- processed/
+|   |       +-- cleaned_courses.csv
+|   +-- notebooks/
+|   |   +-- preprocessing.ipynb
+|   +-- scripts/
+|       +-- performance_test.py
++-- frontend/
+    +-- index.html
+    +-- package.json
+    +-- package-lock.json
+    +-- src/
+        +-- App.jsx
+        +-- main.jsx
+        +-- api/
+        |   +-- client.js
+        +-- styles/
+            +-- app.css
 ```
 
----
+## Tech Stack
 
-# 5. Understanding the Two Inputs in the System
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 18, Vite, lucide-react |
+| Backend | FastAPI, Uvicorn |
+| Data | Coursera course CSV files |
+| PDF parsing | pypdf |
+| Image OCR | Pillow, pytesseract, Tesseract executable, OpenRouter vision |
+| Speech transcription | Groq Whisper API |
+| Retrieval | BM25 keyword search, OpenRouter embeddings, Pinecone vector search, TF-IDF semantic fallback |
+| Fusion/ranking | Reciprocal Rank Fusion, BGE reranker wrapper, personalized weighted scoring |
+| Agents | LangGraph |
+| Graph | Neo4j graph support, prerequisite-rule fallback |
+| Evaluation | RAGAS, DeepEval, structural metrics |
+| Tracing | LangSmith |
 
-The system has TWO main data streams.
+## Data
 
----
-
-# A. User Input Stream
-
-Dynamic user query.
-
-Input can be:
-
-* text
-* speech
-* image
-* screenshot
-* PDF
-
-Example:
-
-> “I want to learn AI for healthcare.”
-
-Pipeline:
+The backend reads the processed course catalog from:
 
 ```text
-Speech → Whisper → text
-Image/PDF → OCR → text
-Text → normalization
-↓
-embedding generation
-↓
-hybrid retrieval query
+backend/data/processed/cleaned_courses.csv
 ```
 
----
+The processed file contains 3,612 course rows plus the header. Important columns include:
 
-# B. Course Dataset Stream
+- `Title`
+- `Organization`
+- `Skills`
+- `Ratings`
+- `course_url`
+- `course_description`
+- `Review Count`
+- `Difficulty`
+- `Type`
+- `Duration`
 
-Static knowledge base.
-
-Dataset fields:
-
-* course_name
-* description
-* skills
-* difficulty_level
-* organization
-* rating
-
-This data becomes:
-
-* vector embeddings
-* BM25 searchable index
-* prerequisite graph source
-
----
-
-# 6. Dataset Choice
-
-Preferred dataset:
-
-Kaggle Coursera Dataset.
-
-Reason:
-
-* easier CSV handling
-* simpler preprocessing
-* better pandas integration
-* cleaner ingestion pipeline
-
-HuggingFace dataset version is more useful for training pipelines and dataset APIs.
-
----
-
-# 7. Preprocessing Strategy
-
-Modern embedding-based RAG systems should NOT use heavy traditional NLP preprocessing.
-
----
-
-# User Query Preprocessing
-
-Recommended:
-
-* lowercase
-* whitespace normalization
-* OCR cleanup
-* noise removal
-
-Avoid:
-
-* aggressive stopword removal
-* stemming
-* heavy lemmatization
-
-Reason:
-Embedding models understand natural language better than heavily cleaned tokens.
-
-Example:
-
-GOOD:
+Raw source files are stored in:
 
 ```text
-I want to learn machine learning
+backend/data/raw/
 ```
 
-BAD:
+## Backend Setup
+
+From the repository root:
+
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Create `backend/.env` for API keys and service integrations. The file is intentionally ignored by git.
+
+```env
+OPENROUTER_API_KEY=
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_VISION_MODEL=google/gemini-2.5-flash
+EMBEDDING_MODEL=nvidia/llama-nemotron-embed-vl-1b-v2
+
+GROQ_API_KEY=
+GROQ_DEFAULT_MODEL=llama-3.3-70b-versatile
+GROQ_WHISPER_MODEL=whisper-large-v3-turbo
+
+PINECONE_API_KEY=
+PINECONE_INDEX_NAME=university-courses
+PINECONE_INDEX_DIMENSION=2048
+PINECONE_METRIC=cosine
+PINECONE_CLOUD=aws
+PINECONE_REGION=us-east-1
+PINECONE_NAMESPACE=courses
+
+NEO4J_URI=
+NEO4J_USERNAME=
+NEO4J_PASSWORD=
+
+LANGSMITH_API_KEY=
+LANGSMITH_PROJECT=
+LANGSMITH_ENDPOINT=
+
+SKIP_AUTO_EVALUATION=true
+TESSERACT_CMD=
+```
+
+### Environment Variables
+
+- Text recommendations run with BM25 keyword search and TF-IDF semantic fallback.
+- `GROQ_API_KEY` enables audio transcription and LLM-generated summaries.
+- `OPENROUTER_API_KEY` enables OpenRouter embeddings and OpenRouter vision OCR.
+- `PINECONE_API_KEY` and `PINECONE_INDEX_NAME` enable Pinecone vector search over stored embeddings.
+- `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` enable graph-based prerequisite expansion. Missing Neo4j credentials activate the implemented prerequisite-rule fallback.
+- `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` enable tracing.
+- `SKIP_AUTO_EVALUATION=true` is recommended during development because automatic evaluation can add latency and may call external services.
+
+## Run the Backend
+
+From `backend/` with the virtual environment activated:
+
+```powershell
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Health check:
 
 ```text
-want learn machin learn
+GET http://127.0.0.1:8000/health
 ```
 
----
-
-# Course Data Preprocessing
-
-Recommended:
-
-* remove duplicates
-* handle missing values
-* normalize metadata
-* combine fields into rich text
-
-Example:
+Interactive API docs:
 
 ```text
-Course: Machine Learning.
-Skills: Python, regression, classification.
-Difficulty: beginner.
+http://127.0.0.1:8000/docs
 ```
 
----
+## Frontend Setup
 
-# 8. Hybrid Retrieval System
+From the repository root:
 
-The system uses BOTH:
+```powershell
+cd frontend
+npm install
+```
 
-1. Semantic Search
-2. Keyword Search
+Run the frontend:
 
----
+```powershell
+npm run dev
+```
 
-# Semantic Search
-
-Uses:
-
-* embeddings
-* Pinecone
-
-Purpose:
-
-* understand meaning
-* retrieve conceptually related courses
-
----
-
-# Keyword Search
-
-Uses:
-
-* BM25 
-
-Purpose:
-
-* exact term matching
-* skill-specific retrieval
-
----
-
-# Why Hybrid Retrieval Is Important
-
-Semantic search alone may miss:
-
-* exact technologies
-* specific skill names
-
-BM25 alone may miss:
-
-* semantic meaning
-* conceptual similarity
-
-Hybrid retrieval combines both strengths.
-
----
-
-# 9. Reciprocal Rank Fusion (RRF)
-
-Hybrid retrieval results are merged using:
-
-Reciprocal Rank Fusion.
-
-Reason:
-
-* more stable than raw score merging
-* uses ranking positions instead of incompatible scores
-* commonly used in production retrieval systems
-
-Pipeline:
+Open:
 
 ```text
-Semantic Search Results
-+
-BM25 Results
-↓
-RRF Fusion
-↓
-Merged Candidates
+http://127.0.0.1:5173
 ```
 
----
+The frontend calls the backend at `http://127.0.0.1:8000` by default. To override it, set:
 
-# 10. Reranking Layer
+```env
+VITE_API_BASE=http://127.0.0.1:8000
+```
 
-After hybrid retrieval, reranking improves final recommendation quality.
+Build the frontend:
 
-Tools:
+```powershell
+npm run build
+```
 
-* BGE reranker
-* Cohere rerank
+## User Inputs
 
-Purpose:
+The frontend keeps the visible form simple:
 
-* read query and course together
-* improve final relevance ordering
+- Learning goal
+- Current skills
+- Student level
+- Career goal
+- Results count
+- Audio upload
+- PDF upload
+- Image upload
 
----
 
-# 11. Personalized Ranking
-
-The ranking stage includes learning preference modeling.
-
-This happens AFTER retrieval.
-
-Pipeline:
+Example learning goal:
 
 ```text
-Hybrid Retrieval
-↓
-Candidate Courses
-↓
-Weighted Scoring + Reranking
-↓
-Final Courses
+I want to learn machine learning for healthcare.
 ```
 
----
-
-# Weighted Scoring Formula
-
-Example:
+Example current skills:
 
 ```text
-final_score =
-0.5 * semantic_similarity +
-0.2 * rating_score +
-0.15 * difficulty_match +
-0.15 * skill_overlap
+Python, statistics, SQL
 ```
 
----
+## API Endpoints
 
-# Features Used
+### GET `/health`
 
-## Semantic Similarity
+Returns backend health status.
 
-Cosine similarity between:
+### POST `/recommend`
 
-* query embedding
-* course embedding
+Main text recommendation endpoint.
 
-## Rating Score
+Minimal request:
 
-Higher-rated courses receive ranking boosts.
+```json
+{
+  "query": "I want to learn AI for climate forecasting",
+  "current_skills": ["Python", "Statistics"],
+  "student_level": "beginner",
+  "career_goal": "Climate AI Engineer",
+  "top_k": 5
+}
+```
 
-## Difficulty Match
+Response includes:
 
-Matches course difficulty to student level.
+- normalized query
+- recommendation list
+- explanations
+- prerequisite gaps
+- learning path
+- career alignment
+- validation warnings
+- agent handoffs
+- skill graph summary
 
-## Skill Overlap
+### POST `/speech-query`
 
-Measures overlap between:
+Multipart audio upload endpoint.
 
-* user skills
-* course skills
+Form fields:
 
----
+- `file`
+- `current_skills`
+- `student_level`
+- `career_goal`
+- `top_k` (`topK` is also accepted for compatibility)
 
-# 12. Multi-Agent System
+The backend transcribes audio with Groq Whisper, then runs the same recommendation pipeline.
 
-Implemented using LangGraph.
+### POST `/upload-pdf`
 
----
+Multipart PDF upload endpoint.
 
-# Agents Required
+Form fields:
 
-## 1. Course Retrieval Agent
+- `file`
+- `current_skills`
+- `student_level`
+- `career_goal`
+- `top_k` (`topK` is also accepted for compatibility)
 
-Retrieves relevant courses.
+The backend extracts PDF text with `pypdf`, then runs the recommendation pipeline.
 
----
+### POST `/upload-image`
 
-## 2. Skill Gap Analysis Agent
+Multipart image upload endpoint.
 
-Identifies missing prerequisite skills.
+Form fields:
 
----
+- `file`
+- `current_skills`
+- `student_level`
+- `career_goal`
+- `top_k` (`topK` is also accepted for compatibility)
 
-## 3. Learning Path Planning Agent
+The backend extracts image text with Tesseract when `tesseract.exe` is available. Missing Tesseract activates the implemented OpenRouter vision fallback when `OPENROUTER_API_KEY` is configured.
 
-Creates structured learning sequences.
+### GET `/analytics`
 
----
+Returns catalog-level analytics:
 
-## 4. Career Alignment Agent
+- total indexed courses
+- popular skills
+- difficulty distribution
+- top organizations
+- success and completion estimates
+- high-success courses
+- skill graph overview
 
-Maps courses to career tracks.
+### POST `/evaluation`
 
----
-
-## 5. Learning Advisor Agent
-
-Generates final recommendation summaries.
-
----
-
-# Why LangGraph Was Preferred
-
-Compared with CrewAI and AutoGen:
-
-LangGraph was preferred because:
-
-* graph-based orchestration
-* persistent state
-* deterministic execution
-* proper agent handoffs
-* suitable for structured AI pipelines
-
-CrewAI:
-
-* easier
-* good for demos
-* weaker orchestration control
-
-AutoGen:
-
-* conversation-focused
-* less deterministic
-
----
-
-# 13. Knowledge Graph and Neo4j
-
-Neo4j is used to represent:
-
-* skills
-* prerequisites
-* course relationships
-* learning progression
-
----
-
-# Example Graph
+Runs evaluation for a recommendation response and writes metrics to:
 
 ```text
-Python → Machine Learning → Deep Learning
+backend/evaluation_metrics.txt
 ```
 
----
+### GET `/graph/status`
 
-# Why Neo4j Helps
+Returns Neo4j connectivity and graph counts.
 
-Enables:
+### POST `/graph/sync-prerequisites`
 
-* prerequisite validation
-* learning path generation
-* skill gap analysis
-* dependency traversal
+Syncs the default prerequisite graph into Neo4j when Neo4j is configured.
 
----
-
-# 14. Learning Objective Validation Guardrails
-
-Guardrails prevent:
-
-* invalid recommendations
-* unrealistic course paths
-* prerequisite violations
-* inappropriate difficulty jumps
-
----
-
-# Important Guardrails
-
-## 1. Prerequisite Validation Guardrail
-
-Checks whether student has required foundational knowledge.
-
-Implemented using Neo4j graph traversal.
-
----
-
-## 2. Difficulty Validation Guardrail
-
-Prevents beginner students from receiving highly advanced recommendations.
-
----
-
-## 3. Learning Objective Alignment Guardrail
-
-Ensures recommendations align with the student’s stated goal.
-
----
-
-## 4. Sequence Validation Guardrail
-
-Ensures learning paths follow valid order.
-
-Example:
-
-GOOD:
+## Recommendation Pipeline
 
 ```text
-Python → ML → Deep Learning
+Text / Audio / PDF / Image input
+        |
+        v
+Text extraction and transcription layer
+        |
+        v
+Query normalization
+        |
+        v
+Candidate retrieval
+  - BM25 keyword search
+  - Pinecone vector search
+  - TF-IDF semantic fallback
+        |
+        v
+Reciprocal Rank Fusion
+        |
+        v
+Reranking and personalized scoring
+        |
+        v
+LangGraph agent workflow
+  - Course retrieval agent
+  - Skill gap agent
+  - Learning path planner
+  - Career alignment agent
+  - Advisor agent
+        |
+        v
+Prerequisite validation
+        |
+        v
+Final recommendation response
+        |
+        v
+Evaluation and tracing
 ```
 
-BAD:
+## Retrieval Behavior
+
+The retrieval layer includes a fallback path for environments that do not have external vector services configured:
+
+1. Load courses from `cleaned_courses.csv`.
+2. Filter candidates by metadata when filters are provided.
+3. Run BM25 keyword search.
+4. Run OpenRouter embeddings plus Pinecone vector search when service keys are configured.
+5. Run TF-IDF semantic fallback when Pinecone results are unavailable.
+6. Fuse results with RRF.
+7. Rerank and score using:
+   - semantic similarity
+   - rating
+   - difficulty fit
+   - skill overlap
+   - adaptive difficulty
+   - estimated success rate
+   - estimated completion rate
+   - popularity
+   - peer/career fit
+   - preference signals
+
+## Multimodal Notes
+
+### PDF
+
+PDF parsing uses `pypdf`.
+
+### Image
+
+Image OCR uses `pytesseract`, which requires the separate Tesseract executable for machine-level OCR.
+
+Missing Tesseract activates the OpenRouter vision fallback when `OPENROUTER_API_KEY` is configured.
+
+To point to a Windows Tesseract install manually:
+
+```env
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+```
+
+### Audio
+
+Audio transcription uses the Groq API. Set `GROQ_API_KEY` before using `/speech-query`.
+
+## Pinecone Indexing
+
+To create embeddings and upsert the processed course catalog into Pinecone:
+
+```powershell
+cd backend
+.\venv\Scripts\activate
+python -m app.rag.index_courses
+```
+
+Required:
+
+- `OPENROUTER_API_KEY`
+- `PINECONE_API_KEY`
+- `PINECONE_INDEX_NAME`
+
+Missing Pinecone configuration activates BM25 keyword search plus TF-IDF semantic fallback.
+
+## Neo4j Prerequisite Graph
+
+Missing Neo4j credentials activate prerequisite rules from `backend/app/graph/prerequisite_validator.py`.
+
+To sync the default graph after configuring Neo4j:
 
 ```text
-Deep Learning → Python
+POST http://127.0.0.1:8000/graph/sync-prerequisites
 ```
 
----
-
-# 15. Evaluation Layer
-
----
-
-# RAGAS
-
-Used for:
-
-* retrieval evaluation
-* context precision
-* faithfulness
-* recall
-
----
-
-# DeepEval
-
-Used for:
-
-* agent evaluation
-* hallucination detection
-* reasoning evaluation
-* LLM-as-judge
-
----
-
-# 16. LangSmith Tracing
-
-Used for:
-
-* observability
-* debugging
-* prompt tracing
-* latency tracking
-* token tracking
-
-Very useful during development and demos.
-
----
-
-# 17. FastAPI Backend Design
-
-FastAPI acts as the AI orchestration backend.
-
----
-
-# Suggested API Endpoints
-
-## POST /recommend
-
-Main recommendation endpoint.
-
----
-
-## POST /speech-query
-
-Audio input endpoint.
-
----
-
-## POST /upload-pdf
-
-PDF upload endpoint.
-
----
-
-## POST /upload-image
-
-Image upload endpoint.
-
----
-
-## GET /analytics
-
-Returns:
-
-* popular courses
-* trends
-* statistics
-
----
-
-# 18. React Frontend Design
-
-Suggested pages:
-
-## Home/Search Page
-
-* text input
-* upload support
-* speech input
-
----
-
-## Recommendation Page
-
-Shows:
-
-* recommended courses
-* ratings
-* prerequisite alerts
-* explanations
-
----
-
-## Learning Path Visualization
-
-Can use:
-
-* React Flow
-* D3.js
-
----
-
-## Analytics Dashboard
-
-Shows:
-
-* trending courses
-* completion trends
-* popular skills
-
----
-
-# 19. Suggested Backend Folder Structure
+Check status:
 
 ```text
-backend/
-│
-├── app/
-│   ├── main.py
-│   ├── routes/
-│   ├── agents/
-│   ├── rag/
-│   ├── graph/
-│   ├── reranker/
-│   ├── evaluation/
-│   ├── utils/
-│   └── models/
-│
-├── data/
-├── notebooks/
-├── requirements.txt
-└── README.md
+GET http://127.0.0.1:8000/graph/status
 ```
 
----
+## Evaluation
 
-# 20. Suggested Frontend Folder Structure
+The system can write evaluation metrics to `backend/evaluation_metrics.txt`.
 
-```text
-frontend/
-│
-├── src/
-│   ├── pages/
-│   ├── components/
-│   ├── api/
-│   ├── hooks/
-│   └── utils/
-│
-├── public/
-└── package.json
+Evaluation includes:
+
+- RAGAS metrics when dependencies and keys are available
+- DeepEval metrics when dependencies and keys are available
+- Structural metrics when external evaluators are unavailable
+
+For faster development, set:
+
+```env
+SKIP_AUTO_EVALUATION=true
 ```
 
----
+You can still call `/evaluation` manually.
 
-# 21. Recommended Implementation Order
+## Performance Test
 
-Do NOT start with agents.
+Run the load test script while the backend is running:
 
-Correct order:
-
-## Phase 1
-
-* dataset ingestion
-* preprocessing
-* embeddings
-* Pinecone semantic setup + local BM25 setup
-
----
-
-## Phase 2
-
-* basic hybrid retrieval API
-
----
-
-## Phase 3
-
-* reranking
-* weighted scoring
-
----
-
-## Phase 4
-
-* Neo4j prerequisite graph
-
----
-
-## Phase 5
-
-* LangGraph agents
-
----
-
-## Phase 6
-
-* React frontend
-
----
-
-## Phase 7
-
-* evaluation
-* tracing
-* optimization
-
----
-
-# 22. Final Core Pipeline
-
-```text
-User Input
-(text/speech/pdf/image)
-        ↓
-Text Extraction
-        ↓
-Normalization
-        ↓
-Embedding Generation
-        ↓
-Hybrid Retrieval
-(Pinecone + BM25)
-        ↓
-RRF Fusion
-        ↓
-Cross Encoder Reranking
-        ↓
-LangGraph Agent Pipeline
-        ↓
-Neo4j Prerequisite Validation
-        ↓
-Learning Path Generation
-        ↓
-Final Recommendation
-        ↓
-Evaluation + Tracing
+```powershell
+cd backend
+.\venv\Scripts\activate
+python scripts/performance_test.py --base-url http://127.0.0.1:8000 --requests 30 --concurrency 5
 ```
 
+For retrieval-only latency tests, use:
+
+```env
+SKIP_AUTO_EVALUATION=true
+```
+
+## Sample Assets
+
+The repository includes sample input files for demos and manual testing:
+
+- `input_text.pdf`
+- `input_image.png`
+- `input_audio.mp3`
+
+`audio_file_generate.py` uses `gTTS` to generate a sample audio prompt. Install `gTTS` separately to regenerate the audio file:
+
+```powershell
+python -m pip install gTTS
+python audio_file_generate.py
+```
+
+## Common Troubleshooting
+
+### PDF upload returns a parsing dependency error
+
+Install backend dependencies inside the backend virtual environment:
+
+```powershell
+cd backend
+.\venv\Scripts\activate
+python -m pip install -r requirements.txt
+```
+
+### Image upload says Tesseract is missing
+
+Install Tesseract OCR on the machine. Missing Tesseract can be handled by configuring `OPENROUTER_API_KEY` for OpenRouter vision OCR.
+
+### Audio upload fails
+
+Set `GROQ_API_KEY` in `backend/.env`.
+
+### Uploads always return 5 courses
+
+Restart the backend server after code changes. The frontend sends both `top_k` and `topK`; the backend accepts either field and clamps the value between 1 and 20.
+
+### Recommendations are slow
+
+Set:
+
+```env
+SKIP_AUTO_EVALUATION=true
+```
+
+Evaluation and LLM summaries can add latency.
+
+## Development Commands
+
+Backend:
+
+```powershell
+cd backend
+.\venv\Scripts\activate
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run dev
+```
+
+Frontend build:
+
+```powershell
+cd frontend
+npm run build
+```
+
+Python syntax check:
+
+```powershell
+cd backend
+.\venv\Scripts\activate
+python -m compileall app
+```
+
+## Notes for Reviewers
+
+- The app remains usable when Pinecone and Neo4j are not configured because BM25 retrieval, TF-IDF semantic fallback, and prerequisite-rule fallback are implemented.
+- External keys unlock higher-quality speech, vision, embeddings, evaluation, and tracing.
+- The visible frontend form intentionally hides advanced backend fields and sends safe defaults.
+- `backend/.env`, `frontend/node_modules/`, and `frontend/dist/` are ignored by git.
