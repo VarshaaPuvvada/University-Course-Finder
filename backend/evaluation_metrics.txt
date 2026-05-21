@@ -1,10 +1,10 @@
 Intelligent University Course Finder - Evaluation Metrics
-Generated at: 2026-05-21T17:13:55+00:00
+Generated at: 2026-05-21T17:40:47+00:00
 
-Normalized query: prompt i want to learn computer vision and reinforcement learning for self-driving cars current skills python linear algebra student level intermediate career goal autonomous systems engineer number of results three
-Recommendation count: 3
+Normalized query: prompt: i want to learn deep learning for medical image analysis and disease detection current skills: python, machine learning, data visualization student level: intermediate career goal: healthcare ai engineer number of results: 6
+Recommendation count: 5
 Learning path length: 8
-Career alignment: Recommended career direction: roles using Cloud Computing, Computer Architecture, Operating Systems, Algebra.
+Career alignment: Recommended career direction: roles using Machine Learning, Deep Learning, Machine Learning Algorithms, Python Programming.
 
 Retrieval metrics:
 - ragas_available: 0.000
@@ -19,21 +19,33 @@ Agent metrics:
 - skill_gap_coverage: 1.000
 
 Recommendations:
-1. Introduction To Computers And Operating Systems And Security
-   Organization: Microsoft
-   Difficulty: beginner
-   Final score: 0.9244
-   Skills: Cloud Computing, Computer Architecture, Operating Systems, System Security
-   Prerequisite gaps: None
-2. Mathematics For Machine Learning
-   Organization: Imperial College London
-   Difficulty: beginner
-   Final score: 0.8947
-   Skills: Algebra, Linear Algebra, Mathematics, Machine Learning, Mathematical Theory & Analysis, Computer Programming, Python Programming, Machine Learning Algorithms
-   Prerequisite gaps: statistics
-3. IBM Applied AI
+1. IBM Applied AI
    Organization: IBM
    Difficulty: beginner
-   Final score: 0.8601
+   Final score: 0.9263
    Skills: Machine Learning, Deep Learning, Machine Learning Algorithms, Artificial Neural Networks, Python Programming, Cloud Computing, Computer Vision, Human Learning
+   Prerequisite gaps: statistics
+2. IBM Data Science
+   Organization: IBM
+   Difficulty: beginner
+   Final score: 0.8678
+   Skills: Python Programming, Data Science, Machine Learning, Data Analysis, Algorithms, Data Management, Data Visualization, Human Learning
+   Prerequisite gaps: statistics
+3. IBM AI Engineering
+   Organization: IBM
+   Difficulty: intermediate
+   Final score: 0.8291
+   Skills: Machine Learning, Deep Learning, Artificial Neural Networks, Human Learning, Python Programming, Machine Learning Algorithms, Applied Machine Learning, Algorithms
+   Prerequisite gaps: statistics
+4. AI In Healthcare
+   Organization: Stanford University
+   Difficulty: beginner
+   Final score: 0.8031
+   Skills: Machine Learning, Leadership and Management, Data Analysis, Critical Thinking, Data Mining
+   Prerequisite gaps: python programming, statistics
+5. Preparing For Google Cloud Certification: Machine Learning Engineer
+   Organization: Google Cloud
+   Difficulty: intermediate
+   Final score: 0.7952
+   Skills: Machine Learning, Google Cloud Platform, Applied Machine Learning, Cloud Computing, Human Learning, Machine Learning Software, Cloud Platforms, Machine Learning Algorithms
    Prerequisite gaps: statistics
