@@ -1,0 +1,25 @@
+Intelligent University Course Finder - Evaluation Metrics
+Generated at: 2026-05-21T09:32:59+00:00
+
+Normalized query: data analysis with sql
+Recommendation count: 1
+Learning path length: 3
+Career alignment: Recommended career direction: roles using Databases, SQL, Data Management.
+
+Retrieval metrics:
+- context_precision: 1.000
+- faithfulness: 1.000
+- recall_proxy: 0.600
+
+Agent metrics:
+- hallucination_risk_proxy: 0.150
+- reasoning_proxy: 1.000
+- skill_gap_coverage: 1.000
+
+Recommendations:
+1. learn sql basics for data science
+   Organization: university of california, davis
+   Difficulty: beginner
+   Final score: 0.9340
+   Skills: Databases, SQL, Data Management, Data Analysis, Big Data, Data Model, Exploratory Data Analysis, Database Administration
+   Prerequisite gaps: python programming, statistics

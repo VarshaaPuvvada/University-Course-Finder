@@ -37,14 +37,14 @@ The system should:
 
 | Component          | Recommended Tool                       |
 | ------------------ | -------------------------------------- |
-| Frontend           | React + Vite + Tailwind                |
+| Frontend           | React + Vite              |
 | Backend            | FastAPI                                |
 | Speech-to-text     | Whisper                                |
 | PDF Parsing        | PyMuPDF                                |
 | OCR                | Tesseract OCR                          |
 | Embeddings         | OpenAI text-embedding-3-small or large |
 | Vector DB          | Pinecone                               |
-| Keyword Search     | OpenSearch                             |
+| Keyword Search     | Local BM25                             |
 | Hybrid Retrieval   | BM25 + Semantic Search                 |
 | Fusion             | Reciprocal Rank Fusion (RRF)           |
 | Reranking          | BGE Reranker / Cohere Rerank           |
@@ -97,27 +97,6 @@ Chosen because:
 * easy vector database setup
 * managed infrastructure
 * excellent semantic retrieval support
-
-Alternative:
-
-* Qdrant (fully open-source alternative)
-
----
-
-## OpenSearch
-
-Chosen over Elasticsearch because:
-
-* fully open source
-* free
-* supports BM25 and vector search
-* easier for AI/RAG student projects
-
-Used for:
-
-* BM25 keyword retrieval
-* metadata filtering
-* hybrid retrieval support
 
 ---
 
@@ -176,7 +155,7 @@ Query Normalization
 Embedding Generation
         ↓
 Hybrid Retrieval
-(Pinecone + OpenSearch)
+(semantic + BM25)
         ↓
 Reciprocal Rank Fusion (RRF)
         ↓
@@ -356,7 +335,7 @@ Purpose:
 
 Uses:
 
-* BM25 via OpenSearch
+* BM25 
 
 Purpose:
 
@@ -806,7 +785,7 @@ Correct order:
 * dataset ingestion
 * preprocessing
 * embeddings
-* Pinecone/OpenSearch setup
+* Pinecone semantic setup + local BM25 setup
 
 ---
 
@@ -849,69 +828,7 @@ Correct order:
 
 ---
 
-# 22. Important Viva/Interview Explanations
-
-## Why hybrid retrieval?
-
-Semantic search captures meaning.
-BM25 captures exact keywords.
-Combining both improves retrieval quality.
-
----
-
-## Why RRF?
-
-Raw BM25 and vector scores are incompatible.
-RRF uses ranking positions for stable fusion.
-
----
-
-## Why Neo4j?
-
-Prerequisites naturally form dependency graphs.
-Neo4j enables traversal and learning path generation.
-
----
-
-## Why LangGraph?
-
-The system requires:
-
-* agent handoffs
-* stateful orchestration
-* structured workflows
-
-LangGraph is better suited than CrewAI for this.
-
----
-
-## Why minimal preprocessing?
-
-Modern embeddings understand natural language.
-Heavy stemming/stopword removal reduces semantic quality.
-
----
-
-# 23. Simplifications If Time Is Limited
-
-Core features to prioritize:
-
-* hybrid retrieval
-* reranking
-* Neo4j prerequisite validation
-* learning path generation
-* React UI
-
-Optional advanced features:
-
-* image support
-* DeepEval
-* analytics
-* advanced personalization
-
----
-
-# 24. Final Core Pipeline
+# 22. Final Core Pipeline
 
 ```text
 User Input
@@ -924,7 +841,7 @@ Normalization
 Embedding Generation
         ↓
 Hybrid Retrieval
-(Pinecone + OpenSearch)
+(Pinecone + BM25)
         ↓
 RRF Fusion
         ↓
