@@ -1,0 +1,8 @@
+Prompt:
+I want to learn deep learning for medical image analysis and disease detection
+Current skills:
+Python, Machine Learning, Data Visualization
+Student level:
+Intermediate
+Career goal:
+Healthcare AI Engineer

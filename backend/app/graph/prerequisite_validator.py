@@ -1,4 +1,3 @@
-from app.graph.neo4j_service import Neo4jService
 from app.rag.course_repository import Course
 
 
@@ -19,26 +18,10 @@ def find_prerequisite_gaps(course: Course, current_skills: list[str]) -> list[st
 
 
 def expand_required_skills(skills: set[str]) -> set[str]:
-    graph_required = Neo4jService().expand_prerequisites(skills)
-    if graph_required:
-        return {skill.lower() for skill in graph_required}
-
     required: set[str] = set()
     for skill in skills:
         required.update(BASE_PREREQUISITES.get(skill.lower(), []))
     return required
-
-
-def sync_default_prerequisite_graph() -> dict[str, int | bool | str]:
-    service = Neo4jService()
-    status = service.connectivity_status()
-    synced_edges = service.sync_prerequisites(BASE_PREREQUISITES)
-    return {
-        **status,
-        "synced_edges": synced_edges,
-        "skill_nodes": service.count_skills() if synced_edges else 0,
-        "prerequisite_edges": service.count_prerequisite_edges() if synced_edges else 0,
-    }
 
 
 def build_learning_path(recommended_courses: list[Course]) -> list[str]:

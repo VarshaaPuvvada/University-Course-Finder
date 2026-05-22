@@ -1,51 +1,53 @@
 Intelligent University Course Finder - Evaluation Metrics
-Generated at: 2026-05-21T17:40:47+00:00
+Generated at: 2026-05-22T16:25:55+00:00
 
-Normalized query: prompt: i want to learn deep learning for medical image analysis and disease detection current skills: python, machine learning, data visualization student level: intermediate career goal: healthcare ai engineer number of results: 6
+Normalized query: prompt: i want to learn machine learning for cybersecurity threat detection and anomaly analysis current skills: python, networking, linux student level: beginner career goal: ai security engineer
 Recommendation count: 5
 Learning path length: 8
-Career alignment: Recommended career direction: roles using Machine Learning, Deep Learning, Machine Learning Algorithms, Python Programming.
+Career alignment: Recommended career direction: roles using Linux, Network Security, Computer Security Incident Management, Mobile Security.
 
 Retrieval metrics:
-- ragas_available: 0.000
-- ragas_error: 1.000
+- ragas_available: 1.000
+- ragas_runtime_error: 1.000
 - retrieved_with_explanations: 1.000
 - retrieved_with_skills: 1.000
 
 Agent metrics:
-- deepeval_answer_relevancy_error: 1.000
+- deepeval_answer_relevancy: 1.000
+- deepeval_answer_relevancy_success: 1.000
 - deepeval_available: 1.000
-- deepeval_hallucination_error: 1.000
+- deepeval_hallucination: 0.000
+- deepeval_hallucination_success: 1.000
 - skill_gap_coverage: 1.000
 
 Recommendations:
-1. IBM Applied AI
+1. Sound The Alarm: Detection And Response
+   Organization: Google
+   Difficulty: beginner
+   Final score: 0.9105
+   Skills: Linux, Network Security, Computer Security Incident Management, Leadership and Management
+   Prerequisite gaps: None
+2. Akamai Network Engineering
+   Organization: Akamai Technologies, Inc.
+   Difficulty: beginner
+   Final score: 0.9043
+   Skills: Computer Security Incident Management, Mobile Security, Network Architecture, Network Security, Risk Management
+   Prerequisite gaps: None
+3. Computational Neuroscience
+   Organization: University Of Washington
+   Difficulty: beginner
+   Final score: 0.8946
+   Skills: Mathematics, Computer Programming, Mathematical Theory & Analysis, Probability & Statistics, Python Programming, Computational Logic, Data Analysis, Artificial Neural Networks
+   Prerequisite gaps: statistics
+4. Introduction To Cybersecurity Tools & Cyber Attacks
    Organization: IBM
    Difficulty: beginner
-   Final score: 0.9263
-   Skills: Machine Learning, Deep Learning, Machine Learning Algorithms, Artificial Neural Networks, Python Programming, Cloud Computing, Computer Vision, Human Learning
-   Prerequisite gaps: statistics
-2. IBM Data Science
-   Organization: IBM
+   Final score: 0.8551
+   Skills: Cryptography, Security Software, Cyberattacks, Leadership and Management
+   Prerequisite gaps: None
+5. Comptia A+_ Cyber
+   Organization: Comptia
    Difficulty: beginner
-   Final score: 0.8678
-   Skills: Python Programming, Data Science, Machine Learning, Data Analysis, Algorithms, Data Management, Data Visualization, Human Learning
-   Prerequisite gaps: statistics
-3. IBM AI Engineering
-   Organization: IBM
-   Difficulty: intermediate
-   Final score: 0.8291
-   Skills: Machine Learning, Deep Learning, Artificial Neural Networks, Human Learning, Python Programming, Machine Learning Algorithms, Applied Machine Learning, Algorithms
-   Prerequisite gaps: statistics
-4. AI In Healthcare
-   Organization: Stanford University
-   Difficulty: beginner
-   Final score: 0.8031
-   Skills: Machine Learning, Leadership and Management, Data Analysis, Critical Thinking, Data Mining
-   Prerequisite gaps: python programming, statistics
-5. Preparing For Google Cloud Certification: Machine Learning Engineer
-   Organization: Google Cloud
-   Difficulty: intermediate
-   Final score: 0.7952
-   Skills: Machine Learning, Google Cloud Platform, Applied Machine Learning, Cloud Computing, Human Learning, Machine Learning Software, Cloud Platforms, Machine Learning Algorithms
-   Prerequisite gaps: statistics
+   Final score: 0.8491
+   Skills: Cloud Computing, Cyberattacks, Data Management, Human Computer Interaction, Network Security, Operating Systems, System Security
+   Prerequisite gaps: None

@@ -13,7 +13,7 @@ The project is split into a FastAPI backend and a React/Vite frontend.
 - Hybrid retrieval using BM25 keyword search, Pinecone vector search, and TF-IDF semantic search as the implemented fallback
 - Reciprocal Rank Fusion and reranking
 - LangGraph multi-agent recommendation workflow
-- Prerequisite gap detection with Neo4j graph support and implemented prerequisite rules as the fallback
+- Prerequisite gap detection with implemented prerequisite rules
 - Learning path generation
 - Career alignment summaries
 - Analytics dashboard data
@@ -48,9 +48,7 @@ university-course-finder/
 |   |   |   +-- ragas_eval.py
 |   |   |   +-- runner.py
 |   |   +-- graph/
-|   |   |   +-- neo4j_service.py
 |   |   |   +-- prerequisite_validator.py
-|   |   |   +-- sync_prerequisites.py
 |   |   +-- guardrails/
 |   |   |   +-- learning_guardrails.py
 |   |   +-- learning/
@@ -79,7 +77,6 @@ university-course-finder/
 |   |   +-- routes/
 |   |   |   +-- analytics.py
 |   |   |   +-- evaluation.py
-|   |   |   +-- graph.py
 |   |   |   +-- recommend.py
 |   |   |   +-- speech.py
 |   |   |   +-- upload.py
@@ -123,7 +120,7 @@ university-course-finder/
 | Retrieval | BM25 keyword search, OpenRouter embeddings, Pinecone vector search, TF-IDF semantic fallback |
 | Fusion/ranking | Reciprocal Rank Fusion, BGE reranker wrapper, personalized weighted scoring |
 | Agents | LangGraph |
-| Graph | Neo4j graph support, prerequisite-rule fallback |
+| Prerequisites | Rule-based prerequisite gap detection |
 | Evaluation | RAGAS, DeepEval, structural metrics |
 | Tracing | LangSmith |
 
@@ -186,13 +183,9 @@ PINECONE_CLOUD=aws
 PINECONE_REGION=us-east-1
 PINECONE_NAMESPACE=courses
 
-NEO4J_URI=
-NEO4J_USERNAME=
-NEO4J_PASSWORD=
-
 LANGSMITH_API_KEY=
 LANGSMITH_PROJECT=
-LANGSMITH_ENDPOINT=
+LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 
 SKIP_AUTO_EVALUATION=true
 TESSERACT_CMD=
@@ -204,7 +197,6 @@ TESSERACT_CMD=
 - `GROQ_API_KEY` enables audio transcription and LLM-generated summaries.
 - `OPENROUTER_API_KEY` enables OpenRouter embeddings and OpenRouter vision OCR.
 - `PINECONE_API_KEY` and `PINECONE_INDEX_NAME` enable Pinecone vector search over stored embeddings.
-- `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` enable graph-based prerequisite expansion. Missing Neo4j credentials activate the implemented prerequisite-rule fallback.
 - `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` enable tracing.
 - `SKIP_AUTO_EVALUATION=true` is recommended during development because automatic evaluation can add latency and may call external services.
 
@@ -383,14 +375,6 @@ Runs evaluation for a recommendation response and writes metrics to:
 backend/evaluation_metrics.txt
 ```
 
-### GET `/graph/status`
-
-Returns Neo4j connectivity and graph counts.
-
-### POST `/graph/sync-prerequisites`
-
-Syncs the default prerequisite graph into Neo4j when Neo4j is configured.
-
 ## Recommendation Pipeline
 
 ```text
@@ -493,22 +477,6 @@ Required:
 - `PINECONE_INDEX_NAME`
 
 Missing Pinecone configuration activates BM25 keyword search plus TF-IDF semantic fallback.
-
-## Neo4j Prerequisite Graph
-
-Missing Neo4j credentials activate prerequisite rules from `backend/app/graph/prerequisite_validator.py`.
-
-To sync the default graph after configuring Neo4j:
-
-```text
-POST http://127.0.0.1:8000/graph/sync-prerequisites
-```
-
-Check status:
-
-```text
-GET http://127.0.0.1:8000/graph/status
-```
 
 ## Evaluation
 
@@ -627,7 +595,7 @@ python -m compileall app
 
 ## Notes for Reviewers
 
-- The app remains usable when Pinecone and Neo4j are not configured because BM25 retrieval, TF-IDF semantic fallback, and prerequisite-rule fallback are implemented.
+- The app remains usable when Pinecone is not configured because BM25 retrieval and TF-IDF semantic fallback are implemented.
 - External keys unlock higher-quality speech, vision, embeddings, evaluation, and tracing.
 - The visible frontend form intentionally hides advanced backend fields and sends safe defaults.
 - `backend/.env`, `frontend/node_modules/`, and `frontend/dist/` are ignored by git.

@@ -5,29 +5,47 @@ from typing import Any
 
 from app.utils.env import load_backend_env
 
+DEFAULT_LANGSMITH_ENDPOINT = "https://api.smith.langchain.com"
+
 
 def configure_langsmith() -> tuple[bool, str | None]:
     load_backend_env()
 
     api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY")
     project = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT")
-    endpoint = os.getenv("LANGSMITH_ENDPOINT") or os.getenv("LANGCHAIN_ENDPOINT")
+    endpoint = normalize_langsmith_endpoint(
+        os.getenv("LANGSMITH_ENDPOINT") or os.getenv("LANGCHAIN_ENDPOINT")
+    )
 
     if api_key:
-        os.environ.setdefault("LANGSMITH_API_KEY", api_key)
-        os.environ.setdefault("LANGCHAIN_API_KEY", api_key)
-        os.environ.setdefault("LANGSMITH_TRACING", "true")
-        os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
+        os.environ["LANGSMITH_API_KEY"] = api_key
+        os.environ["LANGCHAIN_API_KEY"] = api_key
+        os.environ["LANGSMITH_TRACING"] = "true"
+        os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
     if project:
-        os.environ.setdefault("LANGSMITH_PROJECT", project)
-        os.environ.setdefault("LANGCHAIN_PROJECT", project)
+        os.environ["LANGSMITH_PROJECT"] = project
+        os.environ["LANGCHAIN_PROJECT"] = project
 
     if endpoint:
-        os.environ.setdefault("LANGSMITH_ENDPOINT", endpoint)
-        os.environ.setdefault("LANGCHAIN_ENDPOINT", endpoint)
+        os.environ["LANGSMITH_ENDPOINT"] = endpoint
+        os.environ["LANGCHAIN_ENDPOINT"] = endpoint
 
     return bool(api_key and project), project
+
+
+def normalize_langsmith_endpoint(endpoint: str | None) -> str | None:
+    if not endpoint:
+        return None
+
+    normalized = endpoint.strip().rstrip("/")
+    if normalized in {
+        "https://smith.langchain.com",
+        "https://smith.langchain.com/api/v1",
+        "https://api.smith.langchain.com/api/v1",
+    }:
+        return DEFAULT_LANGSMITH_ENDPOINT
+    return normalized
 
 
 @contextmanager
