@@ -187,8 +187,6 @@ LANGSMITH_API_KEY=
 LANGSMITH_PROJECT=
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 
-SKIP_AUTO_EVALUATION=true
-TESSERACT_CMD=
 ```
 
 ### Environment Variables
